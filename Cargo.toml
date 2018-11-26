@@ -1,0 +1,7 @@
+[package]
+name = "rust-mancala"
+version = "0.1.0"
+authors = ["quinnnned <quinnnned@gmail.com>"]
+
+[dev-dependencies]
+quickcheck = "0.7.2"
