@@ -123,12 +123,28 @@ impl GameState {
         let mut pit_pointer = pit_index;
         const MAX_PIT_INDEX: usize = 5;
         active_player.pits[pit_pointer] = 0;
+        pit_pointer += 1;
 
         while stones_to_move > 0 {
+            // Active Pits
             while stones_to_move > 0 && pit_pointer < MAX_PIT_INDEX {
-                pit_pointer += 1;
                 stones_to_move -= 1;
                 active_player.pits[pit_pointer] += 1;
+                pit_pointer += 1;
+            }
+
+            // Active Scoring Pit
+            if stones_to_move > 0 {
+                stones_to_move -= 1;
+                active_player.score += 1;
+                pit_pointer = 0;
+            }
+
+            // Inactive Pits
+            while stones_to_move > 0 && pit_pointer < MAX_PIT_INDEX {
+                stones_to_move -= 1;
+                inactive_player.pits[pit_pointer] += 1;
+                pit_pointer += 1;
             }
         }
 
@@ -137,6 +153,8 @@ impl GameState {
             GameMode::WhiteTurn => (active_player, inactive_player),
             _ => (inactive_player, active_player),
         };
+
+        // TODO: Add Game Over Detection
 
         let mode = if last_stone_was_score {
             self.mode
@@ -169,6 +187,17 @@ fn basic_move() {
         GameState::from(GameSkeuomorph {
             b: [0, 4, 4, 4, 4, 4, 4, 1],
             w: [0, 0, 5, 5, 5, 5, 4, 0],
+        })
+    );
+}
+
+#[test]
+fn overflow_move() {
+    assert_eq!(
+        GameState::new().get_next_state(5),
+        GameState::from(GameSkeuomorph {
+            b: [0, 4, 4, 4, 5, 5, 5, 1],
+            w: [0, 4, 4, 4, 4, 4, 0, 1],
         })
     );
 }
